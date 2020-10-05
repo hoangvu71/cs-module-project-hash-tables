@@ -46,7 +46,13 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        count = 0
+        for eachLine in self.table:
+            if eachLine != None:
+                count += 1
 
+        load_factor = count / self.capacity
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -217,7 +223,23 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # copy the entire database to another table
+        # make the capacity double
+        # for each line in the copied_database, we get the node and put it into the new database
 
+        # but first we need to make sure that the conditions are met
+        # conditions are if the nodes take up to 0.7 of load factor
+        # then we resize
+       
+        if self.get_load_factor() >= 0.7:
+            copy_database = self.table
+            self.capacity = new_capacity
+            self.table = [None] * self.capacity
+
+            for eachLine in copy_database:
+                while eachLine != None:
+                    self.put(eachLine.key, eachLine.value)
+                    eachLine = eachLine.next
 
 
 if __name__ == "__main__":
