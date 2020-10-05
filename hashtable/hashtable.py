@@ -89,7 +89,37 @@ class HashTable:
         # Your code here
         node = HashTableEntry(key, value)
         index = self.hash_index(key)
-        self.table[index] = node
+        
+        # Put so that no collison 
+        # if there's node in that array, put this into a function to use recursive
+        def no_collison_put(nodeF):
+            if nodeF != None:
+                # check if that node is the same as what we have
+                    # if it is the same, update that node
+                    next_node = nodeF.next
+                    if nodeF.key == key:
+                        #update node
+                        nodeF.value = value
+                        return nodeF
+                    # if it is not the same and there's no node after that,
+                    elif nodeF.key != key and nodeF.next == None:
+                        #  add that node to the head
+                        old_head = nodeF
+                        nodeF = node
+                        nodeF.next = old_head
+                        self.table[index] = nodeF
+                        return nodeF
+                    # if it is not the same, go to the next node and repeat
+                    elif self.table[index].key != key:
+                        return no_collison_put(next_node)
+        # if there's no node in that array
+        if self.table[index] == None:
+            # put that node in that array
+            self.table[index] = node
+       
+        else:
+            no_collison_put(self.table[index])
+
 
     def delete(self, key):
         """
@@ -101,10 +131,44 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        if self.table[index] == None or self.table[index].key != key:
-            print("Key not found")
-        else:
-            self.table[index] = None
+        
+        # if node is empty
+        if self.table[index] == None:
+            # return None
+            return None
+        
+        # if node is not empty
+        if self.table[index] != None:
+        # if head.key is fit and there's no next
+            if self.table[index].key == key and self.table[index].next == None:
+            # make head = None
+                self.table[index] = None
+        
+        # if head.key is fit and there's next
+            elif self.table[index].key == key and self.table[index].next != None:
+            # make head = currentNode.next
+                self.table[index] = self.table[index].next
+        
+        # else key must fit in one of the node after
+            else: 
+        # put it in a function with previous and current node
+                def no_collison_delete(previousNode, currentNode):
+                    # if key fit and next node == None
+                    if currentNode.key == key and currentNode.next == None:
+                        # then previousnode.next == None
+                        previousNode.next = None
+                        return previousNode
+                    
+                    # if key fit and next node != None
+                    elif currentNode.key == key and currentNode.next != None:
+                        # then previousnode.next = currentnode.next
+                        previousNode.next = currentNode.next
+                        return previousNode
+                    else:
+                        next_node = currentNode.next
+                        return no_collison_delete(currentNode, next_node)
+        # no_collison_delete(previousNode, currentNode)
+                no_collison_delete(self.table[index], self.table[index].next)
 
     def get(self, key):
         """
@@ -116,10 +180,35 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        if self.table[index] != None:
-            return self.table[index].value
-        else:
+        
+        # get all the value, include the ones that is in the linked list
+        # check to see if there's anything in that index
+        # if there is not
+        if self.table[index] == None:
+            # return None
             return None
+        
+        # if there is, put this into a function for a recursive call to next node
+        else:
+            def no_collison_get(node):
+                if node != None:
+                    # check the key
+                    # if key is the same
+                    next_node = node.next
+                    if node.key == key:
+                        # return the value
+                        return node.value
+                    # elif key is not the same and there's no next value in linkedlist:
+                    elif node.key != key and node.next == None:
+                        # return None
+                        return None
+                    # elif key is not he same and there's a next value in linkedlist
+                    elif node.key != key and node.next != None:
+                        # move to the next node
+                        return no_collison_get(next_node)
+
+            return no_collison_get(self.table[index])
+
     def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
@@ -166,7 +255,7 @@ if __name__ == "__main__":
 
     # print("")
 
-    ht = HashTable(15)
+    ht = HashTable(4)
 
     ht.put("key-0", "val-0")
     ht.put("key-1", "val-1")
@@ -179,5 +268,5 @@ if __name__ == "__main__":
     ht.put("key-8", "val-8")
     ht.put("key-9", "val-9")
 
-    return_value = ht.get("key-0")
+    return_value = ht.get("key-9")
     print(return_value)
